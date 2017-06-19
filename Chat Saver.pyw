@@ -51,7 +51,7 @@ class MainWindow(wx.Frame):
         # dirname is an APPLICATION variable that we're choosing to store
         # in with the frame - it's the parent directory for any file we
         # choose to edit in this frame
-        self.dirname = 'D:\desktop'
+        self.dirname = 'D:\desktop\Case Logs(total)'
 
     def OnExit(self,e):
         # A modal with an "are you sure" check - we don't want to exit
@@ -64,20 +64,29 @@ class MainWindow(wx.Frame):
         # Save away the edited text
         # Open the file, do an RU sure check for an overwrite!
         time = datetime.datetime.now()
-        self.filename = time.strftime('%Y-%m-%d_%H-%M_')
+        daytime = time.strftime('%Y-%m-%d_')
+        # self.filename = daytime
         itcontains = self.control.GetValue()
         i = 1
         email_line = itcontains.split('\n', 10)[i]
         while True:
-            if "Email Address" not in email_line:
+            if "Email Address" not in email_line and ("电子邮件地址" not in email_line):
                 i += 1
                 email_line = itcontains.split('\n', 10)[i]
                 continue
             else:
                 break
-        self.filename += email_line + '.txt'
+        self.filename = daytime + email_line + '.txt'
         self.filepath = os.path.join(self.dirname, self.filename)
         # print(self.filepath)
+        # check if file already exists
+        count = 1
+        while os.path.isfile(self.filepath) and os.path.getsize(self.filepath):
+            count += 1
+            self.filename = daytime + email_line + '(' + str(count) + ')' + '.txt'
+            self.filepath = os.path.join(self.dirname, self.filename)
+            # self.status_bar_frame.SetStatusText("Save Successfully!")     
+        
         filehandle=open(self.filepath,'w')
         filehandle.write(itcontains)
         filehandle.close()
